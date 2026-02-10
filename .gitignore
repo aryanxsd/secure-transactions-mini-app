@@ -1,10 +1,10 @@
-# Turbo cache
+# Node
+node_modules/
+
+# Turbo
 .turbo/
 **/.turbo/
 
 # Build output
 dist/
 **/dist/
-
-# Node
-node_modules/
