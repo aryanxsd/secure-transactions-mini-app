@@ -1,13 +1,10 @@
 {
   "functions": {
     "src/server.ts": {
-      "runtime": "nodejs20.x"
+      "runtime": "nodejs@20"
     }
   },
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "src/server.ts"
-    }
+    { "src": "/(.*)", "dest": "src/server.ts" }
   ]
 }
