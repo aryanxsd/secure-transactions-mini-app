@@ -1,0 +1,19 @@
+{
+  "name": "api",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^8.5.0",
+    "@secure/crypto": "workspace:*",
+    "fastify": "^4.29.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}
