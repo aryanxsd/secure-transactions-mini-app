@@ -27,7 +27,6 @@ app.post("/tx/encrypt", async (request, reply) => {
     return { error: "partyId and payload are required" }
   }
 
-  // NOTE: payload first, partyId second (matches your crypto package)
   const record = encryptEnvelope(body.payload, body.partyId)
   store.set(record.id, record)
 
@@ -60,25 +59,18 @@ app.post("/tx/:id/decrypt", async (request, reply) => {
   try {
     const payload = decryptEnvelope(record)
     return payload
-  } catch {
+  } catch (err) {
     reply.code(400)
     return { error: "Decryption failed or data tampered" }
   }
 })
 
-/* ================================
-   VERCEL SERVERLESS HANDLER
-   ================================ */
-export default async function handler(req: any, res: any) {
-  await app.ready()
-  app.server.emit("request", req, res)
-}
-
-/* ================================
-   LOCAL DEVELOPMENT ONLY
-   ================================ */
+// Local dev only
 if (process.env.NODE_ENV !== "production") {
   app.listen({ port: 3001 }).then(() => {
     console.log("API running on http://localhost:3001")
   })
 }
+
+// Export for Vercel
+export default app
