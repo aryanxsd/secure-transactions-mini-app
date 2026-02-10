@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "apps/api/src/server.ts": {
-      "runtime": "nodejs20.x"
-    }
-  }
-}
