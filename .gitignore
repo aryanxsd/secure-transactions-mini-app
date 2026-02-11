@@ -1,6 +1,7 @@
 # Node
 node_modules/
 
+
 # Turbo
 .turbo/
 **/.turbo/
@@ -8,3 +9,6 @@ node_modules/
 # Build output
 dist/
 **/dist/
+
+# Node
+node_modules/

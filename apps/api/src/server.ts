@@ -12,10 +12,8 @@ await app.register(cors, {
   origin: true
 })
 
-// In-memory storage (as allowed)
 const store = new Map<string, TxSecureRecord>()
 
-// POST /tx/encrypt
 app.post("/tx/encrypt", async (request, reply) => {
   const body = request.body as {
     partyId?: string
@@ -33,7 +31,6 @@ app.post("/tx/encrypt", async (request, reply) => {
   return record
 })
 
-// GET /tx/:id (encrypted only)
 app.get("/tx/:id", async (request, reply) => {
   const { id } = request.params as { id: string }
 
@@ -46,7 +43,6 @@ app.get("/tx/:id", async (request, reply) => {
   return record
 })
 
-// POST /tx/:id/decrypt
 app.post("/tx/:id/decrypt", async (request, reply) => {
   const { id } = request.params as { id: string }
 
@@ -59,18 +55,25 @@ app.post("/tx/:id/decrypt", async (request, reply) => {
   try {
     const payload = decryptEnvelope(record)
     return payload
-  } catch (err) {
+  } catch {
     reply.code(400)
     return { error: "Decryption failed or data tampered" }
   }
 })
 
-// Local dev only
+/*
+ ✅ LOCAL MODE
+*/
 if (process.env.NODE_ENV !== "production") {
   app.listen({ port: 3001 }).then(() => {
     console.log("API running on http://localhost:3001")
   })
 }
 
-// Export for Vercel
-export default app
+/*
+ ✅ SERVERLESS MODE (Vercel / Netlify)
+*/
+export default async function handler(req: any, res: any) {
+  await app.ready()
+  app.server.emit("request", req, res)
+}
