@@ -6,73 +6,72 @@ import {
   TxSecureRecord
 } from "@secure/crypto"
 
-const app = fastify({ logger: true })
+function buildApp() {
+  const app = fastify()
 
-await app.register(cors, {
-  origin: true
-})
+  app.register(cors, { origin: true })
 
-const store = new Map<string, TxSecureRecord>()
+  const store = new Map<string, TxSecureRecord>()
 
-app.post("/tx/encrypt", async (request, reply) => {
-  const body = request.body as {
-    partyId?: string
-    payload?: object
-  }
+  app.post("/tx/encrypt", async (request, reply) => {
+    const body = request.body as {
+      partyId?: string
+      payload?: object
+    }
 
-  if (!body?.partyId || !body?.payload) {
-    reply.code(400)
-    return { error: "partyId and payload are required" }
-  }
+    if (!body?.partyId || !body?.payload) {
+      reply.code(400)
+      return { error: "partyId and payload are required" }
+    }
 
-  const record = encryptEnvelope(body.payload, body.partyId)
-  store.set(record.id, record)
+    const record = encryptEnvelope(body.payload, body.partyId)
+    store.set(record.id, record)
 
-  return record
-})
+    return record
+  })
 
-app.get("/tx/:id", async (request, reply) => {
-  const { id } = request.params as { id: string }
+  app.get("/tx/:id", async (request, reply) => {
+    const { id } = request.params as { id: string }
 
-  const record = store.get(id)
-  if (!record) {
-    reply.code(404)
-    return { error: "Transaction not found" }
-  }
+    const record = store.get(id)
+    if (!record) {
+      reply.code(404)
+      return { error: "Transaction not found" }
+    }
 
-  return record
-})
+    return record
+  })
 
-app.post("/tx/:id/decrypt", async (request, reply) => {
-  const { id } = request.params as { id: string }
+  app.post("/tx/:id/decrypt", async (request, reply) => {
+    const { id } = request.params as { id: string }
 
-  const record = store.get(id)
-  if (!record) {
-    reply.code(404)
-    return { error: "Transaction not found" }
-  }
+    const record = store.get(id)
+    if (!record) {
+      reply.code(404)
+      return { error: "Transaction not found" }
+    }
 
-  try {
-    const payload = decryptEnvelope(record)
-    return payload
-  } catch {
-    reply.code(400)
-    return { error: "Decryption failed or data tampered" }
-  }
-})
+    try {
+      return decryptEnvelope(record)
+    } catch {
+      reply.code(400)
+      return { error: "Decryption failed or data tampered" }
+    }
+  })
 
-/*
- ✅ LOCAL MODE
-*/
+  return app
+}
+
+const app = buildApp()
+
+// ✅ For local development only
 if (process.env.NODE_ENV !== "production") {
   app.listen({ port: 3001 }).then(() => {
     console.log("API running on http://localhost:3001")
   })
 }
 
-/*
- ✅ SERVERLESS MODE (Vercel / Netlify)
-*/
+// ✅ For Vercel / Serverless
 export default async function handler(req: any, res: any) {
   await app.ready()
   app.server.emit("request", req, res)

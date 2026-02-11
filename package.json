@@ -2,9 +2,14 @@
   "name": "secure-transactions",
   "private": true,
   "packageManager": "pnpm@10.29.2",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "turbo run dev --parallel",
-    "build": "turbo run build"
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@types/node": "^20.19.33",
